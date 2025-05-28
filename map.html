@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mapbox GL JS map</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibGVla2VlbGluZyIsImEiOiJjbWI4ZGYwYnEwa3ZmMm1wOWllZndzbmZuIn0.apz_FSdOsEtzqRYDL7a55w';
+        const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            center: [-74.5, 40], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+            zoom: 9 // starting zoom
+        });
+
+        window.drawRoute = function (coordsJson) {
+            const coords = JSON.parse(coordsJson);
+            if (map.getSource('route')) {
+                map.getSource('route').setData({
+                    type: 'Feature',
+                    geometry: { type: 'LineString', coordinates: coords }
+                });
+            } else {
+                map.addSource('route', {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        geometry: { type: 'LineString', coordinates: coords }
+                    }
+                });
+                map.addLayer({
+                    id: 'route',
+                    type: 'line',
+                    source: 'route',
+                    paint: { 'line-color': '#007AFF', 'line-width': 6 }
+                });
+            }
+            map.fitBounds([coords[0], coords[coords.length - 1]], { padding: 50 });
+        };
+    </script>
+
+</body>
+</html>
